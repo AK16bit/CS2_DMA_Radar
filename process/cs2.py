@@ -11,6 +11,7 @@ from lib.pyMeow import MeowProcess, MeowModule
 from lib.pyMeow.pyMeow import process_exists
 from process.memory import VmmMemoryReadStruct, MeowMemoryReadStruct, MemoryReadAbstract
 from process.module import VmmModuleStruct, MeowModuleStruct, ModuleAbstract
+from utils import dict2class
 
 
 class CS2:
@@ -20,6 +21,8 @@ class CS2:
     client: ModuleAbstract
     engine2: ModuleAbstract
     schemasystem: ModuleAbstract
+
+    offset: Type["offset.Offset"]
 
     @classmethod
     def setup_memprocfs(cls) -> Type["CS2"]:
@@ -97,5 +100,20 @@ class CS2:
         # setup memory read
         MeowMemoryReadStruct._process = cls.process._process
         cls.memory = MeowMemoryReadStruct
+
+        return cls
+
+    @classmethod
+    def update_offsets(cls) -> Type["CS2"]:
+        from process.signature.dump import dump_signatures
+        from process.schema.dump import dump_schemas
+        from process.offset import Offset
+
+        signatures = dump_signatures()
+        schemas = dump_schemas()
+
+        Offset.signatures = dict2class(signatures)
+        Offset.schemas = dict2class(schemas)
+        cls.offset: Type[Offset] = Offset
 
         return cls

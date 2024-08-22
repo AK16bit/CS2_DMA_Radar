@@ -1,11 +1,8 @@
-from functools import lru_cache
 from logging import info
 from typing import Optional, Generator, List, Dict, Union
 
-from memprocfs import FLAG_NOCACHE
 
 from error import PatternConvertError, SchemaModuleDumpError, SchemaClassDumpError
-from process.memory import VmmMemoryReadStruct
 from process.schema.offset import Offset
 from process.schema.struct import StructSchemaSystem, StructModule, StructMemoryPool, StructAllocatedClassBase, \
     StructHashBucket, StructUnAllocatedClassBase, StructClass, StructField

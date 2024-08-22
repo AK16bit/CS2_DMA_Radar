@@ -168,3 +168,13 @@ def logger_setup() -> Logger:
     logger.addHandler(handler)
     logger.setLevel(DEBUG)
     return logger
+
+
+def dict2class(a: dict):
+    return type("", (), {
+        **dict(__dict__=a),
+        **{
+            key: dict2class(item) if isinstance(item, dict) else item
+            for key, item in a.items()
+        }
+    })()

@@ -27,3 +27,7 @@ class SchemaClassDumpError(Exception):
     ...
 
 
+class ProcessSetupError(Exception):
+    ...
+
+

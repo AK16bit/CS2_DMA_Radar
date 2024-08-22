@@ -1,6 +1,6 @@
 from logging import error
 from struct import unpack, error as struct_error
-from typing import Optional, Any, List, Union, override, Sequence
+from typing import Optional, Any, List, Union, override, Sequence, Callable
 
 from memprocfs import FLAG_NOCACHE
 from memprocfs.vmmpyc import VmmProcess
@@ -9,8 +9,30 @@ from lib.pyMeow.pyMeow import r_int8, r_int16, r_int, r_int64, r_uint16, r_uint,
 from lib.pyMeow.structure import StructMeowProcess
 
 
+class MemoryReadCounter:
+    enable: bool = True
+    memory_read_count: int = 0
+
+    @staticmethod
+    def memory_read_counter_decorator(func: Callable) -> Callable:
+        def wrapper(*args, **kwargs) -> Any:
+            if MemoryReadCounter.enable: MemoryReadCounter.memory_read_count += 1
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    @classmethod
+    def get_memory_read_count(cls) -> int:
+        return cls.memory_read_count
+
+    @classmethod
+    def reset_memory_read_count(cls) -> None:
+        cls.memory_read_count = 0
+
+
 class MemoryReadAbstract:
     _process: VmmProcess | StructMeowProcess
+
 
     @staticmethod
     def unpack_byte(byte: bytes, format_str: str) -> Optional[Any]:
@@ -65,6 +87,7 @@ class VmmMemoryReadStruct(MemoryReadAbstract):
     _process: VmmProcess
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_memory(cls, address: int, byte_size: int) -> Optional[bytes]:
         byte = cls._process.memory.read(address, byte_size, FLAG_NOCACHE)
         if not byte:
@@ -127,50 +150,62 @@ class MeowMemoryReadStruct(MemoryReadAbstract):
     _process: StructMeowProcess
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_memory(cls, address: int, size: int) -> Optional[Any]:
         return r_bytes(cls._process, address, size)
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_bool(cls, address: int) -> Optional[bool]:
         return r_bool(cls._process, address)
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_i8(cls, address: int) -> Optional[int]:
         return r_int8(cls._process, address)
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_u16(cls, address: int) -> Optional[int]:
         return r_uint16(cls._process, address)
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_i16(cls, address: int) -> Optional[int]:
         return r_int16(cls._process, address)
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_i32(cls, address: int) -> Optional[int]:
         return r_int(cls._process, address)
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_u32(cls, address: int) -> Optional[int]:
         return r_uint(cls._process, address)
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_i64(cls, address: int) -> Optional[int]:
         return r_int64(cls._process, address)
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_u64(cls, address: int) -> Optional[int]:
         return r_uint64(cls._process, address)
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_f32(cls, address: int) -> Optional[float]:
         return r_float(cls._process, address)
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_vec(cls, address: int, size: int) -> Sequence[float]:
         return r_floats(cls._process, address, size)
 
     @classmethod
+    @MemoryReadCounter.memory_read_counter_decorator
     def read_str(cls, address: int, byte_size: int = 50) -> Optional[str]:
         try: string = r_string(cls._process, address, byte_size)
         except Exception: return None

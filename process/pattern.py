@@ -24,19 +24,22 @@ class Pattern:
         return Address(self._address)
 
     @staticmethod
-    def pattern_str_to_bytes(pattern: str) -> bytes:
+    def pattern_str_to_regex_bytes(pattern: str) -> bytes:
         return rb"".join([
-            rb"." if "?" in hex_byte else rb"\x%s" % hex_byte.encode("utf-8")
+            rb"[\s\S]{1}" if "?" in hex_byte else rb"\x" + hex_byte.encode("utf-8")
             for hex_byte in pattern.split(" ")
         ])
 
     def search(self, module_base: int, module_buffer: bytes) -> Self:
         try:
-            pattern_bytes = self.pattern_str_to_bytes(self.pattern)
-            match_offset = search(pattern_bytes, module_buffer).start()
+            pattern_bytes = self.pattern_str_to_regex_bytes(self.pattern)
+            match_offset = search(pattern_bytes, module_buffer)
 
-            self._address = module_base + match_offset
-        except Exception as error_reason: raise PatternConvertError(self.pattern)
+            if match_offset is None: raise PatternConvertError(self.pattern, pattern_bytes)
+            self._address = module_base + match_offset.start()
+        except PatternConvertError as error: raise error
+        except Exception as error_reason: raise PatternConvertError(self.pattern, error_reason)
+
         return self
 
     def add(self, value: int) -> Self:

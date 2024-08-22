@@ -11,7 +11,6 @@ from process.signature.engine2 import *
 
 
 client_signatures_function = (
-        dwCSGOInput,
         dwEntityList,
         dwGameEntitySystem,
         dwGameEntitySystem_getHighestEntityIndex,
@@ -21,9 +20,6 @@ client_signatures_function = (
         dwLocalPlayerController,
         dwLocalPlayerPawn,
         dwPlantedC4,
-        dwPrediction,
-        dwSensitivity,
-        dwSensitivity_sensitivity,
         dwViewAngles,
         dwViewMatrix,
         dwViewRender,
