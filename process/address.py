@@ -1,9 +1,9 @@
 from functools import wraps
 from logging import warning
-from typing import Self, Optional, Dict, Any, Callable
+from typing import Self, Optional, Dict, Any, Callable, Sequence
 
 from process.cs2 import CS2
-
+from utils import Vec2, Vec3
 
 
 class AddressMemoryRead:
@@ -46,7 +46,7 @@ class AddressMemoryRead:
     def i8(self) -> Optional[int]: return CS2.memory.read_i8(self.address)
 
     @_address_caching_decorator
-    def u8(self) -> Optional[int]: return CS2.memory.read_u8(self.address)
+    def u8(self) -> Optional[int]: return CS2.memory.read_i8(self.address)
 
     @_address_caching_decorator
     def i16(self) -> Optional[int]: return CS2.memory.read_i16(self.address)
@@ -68,6 +68,17 @@ class AddressMemoryRead:
 
     @_address_caching_decorator
     def float(self) -> Optional[float]: return CS2.memory.read_f32(self.address)
+
+    @_address_caching_decorator
+    def vec(self, size: int) -> Optional[Sequence[float]]: return CS2.memory.read_vec(self.address, size)
+
+    @_address_caching_decorator
+    def vec2(self) -> Optional[Vec2]: return Vec2.from_list(CS2.memory.read_vec(self.address, 2))
+
+    @_address_caching_decorator
+    def vec3(self) -> Optional[Vec3]: return Vec3.from_list(CS2.memory.read_vec(self.address, 3))
+
+    def str(self, size: int) -> Optional[str]: return CS2.memory.read_str(self.address, size)
 
 
 class Address(AddressMemoryRead):

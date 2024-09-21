@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script>
+        var socket = io();
+        let localPlayerData = {};
+
+        socket.on('connect', function() {
+            console.log('Connected to server');
+            socket.send('Hello, server!');
+        });
+
+        socket.on('message', function(data) {
+            localPlayerData = data["local_player"];
+
+            draw();
+        });
+    </script>
+
+    <style>
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vmin;
+            height: 100vmin;
+            z-index: 1;
+            margin: 0 auto;
+        }
+        #map_image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vmin;
+            height: 100vmin;
+            z-index: 0;
+            margin: 0 auto;
+            border-radius: 15%;
+            display: inline-block;
+            filter: drop-shadow(5px 5px 8px rgba(0, 0, 0, 0.7));
+        }
+        body {
+            background-image: url('/static/background.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+<body>
+    <img id="map_image" src="/static/de_dust2.png" width="1024" height="1024">
+    <canvas id="overlay" width="1024" height="1024"></canvas>
+
+    <script>
+        const canvas = document.getElementById('overlay');
+        const ctx = canvas.getContext('2d');
+
+        function drawCircle(x, y, color) {
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawCircle(256, 100, 'white')
+            drawCircle(200, 100 + Math.sin(new Date().getTime() * 0.002) * 10, 'white')
+            drawCircle(localPlayerData["x"], localPlayerData["y"], 'white')
+        }
+    </script>
+</body>
+</html>

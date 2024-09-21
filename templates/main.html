@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script>
+        var debug = 0;
+        var socket = io();
+
+        socket.on('connect', function() {
+            console.log('Connected to server');
+            socket.send('Hello, server!');
+        });
+
+        socket.on('message', function(data) {
+            if (debug) {
+                console.log(data);
+            }
+            draw(data);
+        });
+    </script>
+
+    <style>
+        #overlay {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin: 0 0;
+            transform: translateY(-50%) translateX(-50%);
+            width: 85vmin;
+            height: 85vmin;
+            z-index: 1;
+        }
+        #map_image {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin: 0 0;
+            transform: translateY(-50%) translateX(-50%);
+            width: 85vmin;
+            height: 85vmin;
+            z-index: 0;
+            filter: drop-shadow(5px 5px 8px rgba(0, 0, 0, 0.7));
+        }
+        body {
+            background-image: url('/static/background.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+<body>
+    <img id="map_image" src="/static/de_dust2.png" width="1024" height="1024">
+    <canvas id="overlay" width="1024" height="1024"></canvas>
+
+    <script>
+        const canvas = document.getElementById('overlay');
+        const ctx = canvas.getContext('2d');
+
+        function drawCircle(x, y, color) {
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function draw(socketData) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // local player
+            let localPlayerEntity = socketData["local_player"]
+            drawCircle(localPlayerEntity["x"], localPlayerEntity["y"], 'white')
+
+            // teammate
+            socketData["teammate"].forEach(function(playerEntity) {
+                drawCircle(playerEntity["x"], playerEntity["y"], 'cyan')
+            })
+
+            // enemy
+            socketData["enemy"].forEach(function(playerEntity) {
+                drawCircle(playerEntity["x"], playerEntity["y"], 'red')
+            })
+
+
+
+        }
+    </script>
+</body>
+</html>

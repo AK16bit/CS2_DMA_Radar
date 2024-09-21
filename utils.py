@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 from logging import DEBUG, getLogger, StreamHandler, ERROR, WARNING, INFO, Formatter, Logger
 from math import sqrt, degrees, atan2
-from typing import Dict, Optional, Union, Self
+from time import perf_counter
+from typing import Dict, Optional, Union, Self, List, Sequence
+from threading import Timer
 
 
 @dataclass
@@ -9,13 +11,19 @@ class Vec2:
     x: float = .0
     y: float = .0
 
-    @classmethod
-    def fromDict(cls, dict: Dict[str, Optional[float]]) -> "Vec2":
-        x: float = dict.get("x", None)
-        y: float = dict.get("y", None)
-        if None in (x, y): raise ValueError()
 
-        return Vec2(x, y)
+    @classmethod
+    def from_list(cls, input_value: Sequence[Optional[float]]) -> "Vec2":
+        if not len(input_value) == 2: raise ValueError
+
+        return Vec2(*input_value)
+
+    @classmethod
+    def from_dict(cls, input_value: Dict[str, Optional[float]]) -> "Vec2":
+        return Vec2(
+            input_value.get("x", .0),
+            input_value.get("y", .0)
+        )
 
     def __add__(self, other) -> "Vec2":
         if not isinstance(other, Vec2): return NotImplemented
@@ -70,13 +78,18 @@ class Vec3:
         }.get(item, None)
 
     @classmethod
-    def fromDict(cls, dict: Dict[str, Optional[float]]) -> "Vec3":
-        x: float = dict.get("x", None)
-        y: float = dict.get("y", None)
-        z: float = dict.get("z", None)
-        if None in (x, y, z): raise ValueError()
+    def from_list(cls, input_value: Sequence[Optional[float]]) -> "Vec3":
+        if not len(input_value) == 3: raise ValueError
 
-        return Vec3(x, y, z)
+        return Vec3(*input_value)
+
+    @classmethod
+    def from_dict(cls, input_value: Dict[str, Optional[float]]) -> "Vec3":
+        return Vec3(
+            input_value.get("x", .0),
+            input_value.get("y", .0),
+            input_value.get("z", .0)
+        )
 
     def __add__(self, other) -> "Vec3":
         if not isinstance(other, Vec3): return NotImplemented
@@ -178,3 +191,19 @@ def dict2class(a: dict):
             for key, item in a.items()
         }
     })()
+
+
+class TimeUseCounter:
+    def __enter__(self):
+        self.start_time = perf_counter()
+
+    def __exit__(self, _, __, ___):
+        print("time used: %s ms" % ((perf_counter() - self.start_time) * 1000))
+
+
+class RepeatThread(Timer):
+    def run(self):
+        while not self.finished.is_set():
+            self.function(*self.args, **self.kwargs)
+            self.finished.wait(self.interval)
+

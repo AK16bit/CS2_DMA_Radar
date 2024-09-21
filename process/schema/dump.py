@@ -6,8 +6,9 @@ from error import PatternConvertError, SchemaModuleDumpError, SchemaClassDumpErr
 from process.schema.offset import Offset
 from process.schema.struct import StructSchemaSystem, StructModule, StructMemoryPool, StructAllocatedClassBase, \
     StructHashBucket, StructUnAllocatedClassBase, StructClass, StructField
-from process.pattern import Pattern
+from process.pattern import PatternVerA2X, PatternVerOsiris
 from process.cs2 import CS2
+from utils import TimeUseCounter
 
 
 def dump_schemas() -> Dict[str, Dict[str, Dict[str, int]]]:
@@ -46,16 +47,14 @@ def dump_schemas() -> Dict[str, Dict[str, Dict[str, int]]]:
     return schema
 
 
-
-
 def read_schema_system_address() -> Optional[int]:
     try:
         schemasystem_base = CS2.schemasystem.base
         schemasystem_buffer = CS2.memory.read_memory(CS2.schemasystem.base, CS2.schemasystem.size)
 
         schema_system_address = (
-            Pattern(Offset.StructSchemaSystem.SCHEMA_SYSTEM_PATTERN)
-            .search(schemasystem_base, schemasystem_buffer)
+            PatternVerA2X(Offset.StructSchemaSystem.SCHEMA_SYSTEM_PATTERN, schemasystem_base, schemasystem_buffer)
+            .aob_scan()
             .rip(
                 Offset.StructSchemaSystem.SCHEMA_SYSTEM_PATTERN_RIP_OFFSET,
                 Offset.StructSchemaSystem.SCHEMA_SYSTEM_PATTERN_RIP_LENGTH
@@ -127,6 +126,12 @@ def read_class(class_address: int) -> Dict[str, Dict[str, int]]:
     fields = read_field(class_struct.fields, class_struct.fields_count)
     return {class_name: fields}
 
+def read_class_2(class_address: int) -> Dict[str, int]:
+    class_struct = StructClass(class_address)
+
+    fields = read_field(class_struct.fields, class_struct.fields_count)
+    return fields
+
 
 def read_field(fields_base_address: int, fields_count: int) -> Dict[str, int]:
     fields = dict()
@@ -137,4 +142,5 @@ def read_field(fields_base_address: int, fields_count: int) -> Dict[str, int]:
 
         if field_struct.name is None: break
         fields.update({field_struct.name: field_struct.value})
+
     return fields

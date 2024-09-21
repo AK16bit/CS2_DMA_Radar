@@ -11,7 +11,7 @@ from lib.pyMeow import MeowProcess, MeowModule
 from lib.pyMeow.pyMeow import process_exists
 from process.memory import VmmMemoryReadStruct, MeowMemoryReadStruct, MemoryReadAbstract
 from process.module import VmmModuleStruct, MeowModuleStruct, ModuleAbstract
-from utils import dict2class
+from utils import dict2class, TimeUseCounter
 
 
 class CS2:

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script>
+        var socket = io();
+        let localPlayerData = {};
+
+        socket.on('connect', function() {
+            console.log('Connected to server');
+            socket.send('Hello, server!');
+        });
+
+        socket.on('message', function(data) {
+            console.log('Ping: ' + ((new Date().getTime() / 1000) - data["t"]));
+            console.log(data["local_player"]);
+            localPlayerData = data["local_player"];
+
+            draw();
+        });
+    </script>
+
+    <style>
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+#map_image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    border-radius: 15%;
+}
+    </style>
+</head>
+<body>
+    <img id="map_image" src="/static/de_dust2.png" width="1024" height="1024">
+    <canvas id="overlay" width="1024" height="1024"></canvas>
+
+    <script>
+        const canvas = document.getElementById('overlay');
+        const ctx = canvas.getContext('2d');
+
+         function change_map_size(width, height) {
+            document.getElementById("map_image").width = width;
+            document.getElementById("map_image").height = height;
+
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+
+        function drawCircle(x, y, color) {
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function draw() {
+            console.log("drawed");
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawCircle(256, 100, 'white')
+            drawCircle(200, 100 + Math.sin(2) * 10, 'white')
+            drawCircle(localPlayerData["x"], localPlayerData["y"], 'green')
+        }
+    </script>
+</body>
+</html>

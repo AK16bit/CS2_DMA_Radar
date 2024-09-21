@@ -9,7 +9,6 @@ from process.cs2 import CS2
 from process.signature.client import *
 from process.signature.engine2 import *
 
-
 client_signatures_function = (
         dwEntityList,
         dwGameEntitySystem,
@@ -26,12 +25,12 @@ client_signatures_function = (
         dwWeaponC4,
     )
 def get_client_signatures() -> Dict[str, Address]:
-    client_base = CS2.client.base
-    client_buffer = CS2.memory.read_memory(CS2.client.base, CS2.client.size)
+    module_base = CS2.client.base
+    module_buffer = CS2.memory.read_memory(module_base, CS2.client.size)
 
     client_signatures = {
-        client_signature_function.__name__: client_signature_function(client_base, client_buffer).to_Address()
-        for client_signature_function in client_signatures_function
+        signature_function.__name__: signature_function(module_base, module_buffer).to_Address()
+        for signature_function in client_signatures_function
     }
 
     return client_signatures
@@ -45,7 +44,7 @@ engine2_signatures_function = (
     )
 def get_engine2_signatures() -> Dict[str, Address]:
     engine2_base = CS2.engine2.base
-    engine2_buffer = CS2.memory.read_memory(CS2.engine2.base, CS2.engine2.size)
+    engine2_buffer = CS2.memory.read_memory(engine2_base, CS2.engine2.size)
 
     engine2_signatures = {
         engine2_signature_function.__name__: engine2_signature_function(engine2_base, engine2_buffer).to_Address()
@@ -53,6 +52,7 @@ def get_engine2_signatures() -> Dict[str, Address]:
     }
 
     return engine2_signatures
+
 
 
 def dump_signatures() -> Dict[str, Dict[str, Address]]:
@@ -66,5 +66,5 @@ def dump_signatures() -> Dict[str, Dict[str, Address]]:
 
     return dict(
         client=client_signatures,
-        engine2=engine2_signatures
+        engine2=engine2_signatures,
     )
