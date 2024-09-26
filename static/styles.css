@@ -1,0 +1,90 @@
+@font-face {
+    font-family: 'HYWenHei-85W';
+    src: url('/static/HYWenHei-85W.ttf');
+}
+
+body {
+    background-image: url('/static/background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+#radar {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: 0 0;
+    transform: translateY(-50%) translateX(-50%);
+    width: 85vmin;
+    height: 85vmin;
+    opacity: 0;
+    border-radius: 30px;
+    background-color: rgba(255, 255, 255, .1);
+}
+#overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 1));
+}
+#map_image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    filter: drop-shadow(5px 5px 8px rgba(0, 0, 0, .7));
+}
+
+#info_pop {
+    position: fixed;
+    display: grid;
+    place-items: center;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+}
+.info-pop-content {
+    background-color: rgba(255, 200, 200, 0.5);
+    padding: 20px;
+    width: 75%;
+    border-radius: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    filter: drop-shadow(7px 7px 12px rgba(0, 0, 0, .8));
+}
+.info-pop-icon {
+    width: 18vmin;
+    height: 18vmin;
+}
+.info-pop-h1 {
+    padding: 0px 20px;
+    text-align: center;
+    font-size: 6vmin;
+    font-family: 'HYWenHei-85W';
+}
+
+.fade-in {
+    animation-name: fade-in;
+    animation-duration: 0.3s;
+    animation-fill-mode: forwards;
+}
+.fade-out {
+    animation-name: fade-out;
+    animation-duration: 0.3s;
+    animation-fill-mode: forwards;
+}
+@keyframes fade-in {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+@keyframes fade-out {
+    from {opacity: 1;}
+    to {opacity: 0; display: none;}
+}

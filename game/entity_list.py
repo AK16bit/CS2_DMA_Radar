@@ -9,8 +9,8 @@ class EntityList:
     entity_list_address: Optional[Address]
     player_entities: Optional[List[PlayerEntity]]
 
-    _controller_cache_map: Dict[int, Address] = dict()
-    _pawn_cache_map: Dict[int, Address] = dict()
+    _index_2_controller_cache: Dict[int, Address] = dict()
+    _controller_2_pawn_cache: Dict[int, Address] = dict()
 
 
     @classmethod
@@ -39,20 +39,20 @@ class EntityList:
     def player_read(cls, player_index: int) -> Optional[PlayerEntity]:
         player_entity = PlayerEntity(cls.entity_list_address, player_index)
 
-        if (player_controller_address := cls._controller_cache_map.get(player_index, None)) is None:
+        if (player_controller_address := cls._index_2_controller_cache.get(player_index, None)) is None:
             if player_entity.controller is None: return None
-            cls._controller_cache_map.update({player_index: player_entity.controller})
+            cls._index_2_controller_cache.update({player_index: player_entity.controller})
         else: player_entity._player_controller = player_controller_address
 
-        if (player_pawn_address := cls._pawn_cache_map.get(player_entity.controller.address, None)) is None:
+        if (player_pawn_address := cls._controller_2_pawn_cache.get(player_entity.controller.address, None)) is None:
             if player_entity.pawn is None: return None
-            cls._pawn_cache_map.update({player_entity.controller.address: player_entity.pawn})
+            cls._controller_2_pawn_cache.update({player_entity.controller.address: player_entity.pawn})
         else: player_entity._player_pawn = player_pawn_address
 
         return player_entity
 
     @classmethod
     def clear_cache(cls) -> None:
-        cls._controller_cache_map = dict()
-        cls._pawn_cache_map = dict()
+        cls._index_2_controller_cache = dict()
+        cls._controller_2_pawn_cache = dict()
 

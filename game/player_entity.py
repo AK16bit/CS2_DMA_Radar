@@ -1,5 +1,6 @@
 from typing import overload, Optional, Any, Dict, Self
 
+from game.player_weapon import PlayerWeapon
 from process.address import Address
 from process.cs2 import CS2
 from utils import Vec3, Vec2
@@ -109,7 +110,7 @@ class PlayerEntity:
     #     )
 
     @property
-    def health(self) -> int:
+    def health(self) -> Optional[int]:
         return (
             self.pawn.copy()
             .offset(CS2.offset.schemas.client_dll.C_BaseEntity.m_iHealth)
@@ -117,7 +118,15 @@ class PlayerEntity:
         )
 
     @property
-    def pos(self) -> Vec3:
+    def team_num(self) -> Optional[int]:
+        return (
+            self.pawn.copy()
+            .offset(CS2.offset.schemas.client_dll.C_BaseEntity.m_iTeamNum)
+            .u8()
+        )
+
+    @property
+    def pos(self) -> Optional[Vec3]:
         return (
             self.pawn.copy()
             .offset(CS2.offset.schemas.client_dll.C_BasePlayerPawn.m_vOldOrigin)
@@ -125,7 +134,7 @@ class PlayerEntity:
         )
 
     @property
-    def angle(self) -> Vec2:
+    def angle(self) -> Optional[Vec2]:
         return (
             self.pawn.copy()
             .offset(CS2.offset.schemas.client_dll.C_CSPlayerPawnBase.m_angEyeAngles)
@@ -133,10 +142,31 @@ class PlayerEntity:
         )
 
     @property
-    def team_num(self) -> int:
+    def name(self) -> Optional[str]:
         return (
-            self.pawn.copy()
-            .offset(CS2.offset.schemas.client_dll.C_BaseEntity.m_iTeamNum)
-            .u8()
+            self.controller.copy()
+            .offset(CS2.offset.schemas.client_dll.CCSPlayerController.m_sSanitizedPlayerName)
+            .pointer()
+            .str(64)
         )
 
+    @property
+    def money(self) -> Optional[int]:
+        return (
+            self.controller.copy()
+            .offset(CS2.offset.schemas.client_dll.CCSPlayerController.m_pInGameMoneyServices)
+            .pointer()
+            .offset(CS2.offset.schemas.client_dll.CCSPlayerController_InGameMoneyServices.m_iAccount)
+            .i32()
+        )
+
+    @property
+    def weapon(self) -> Optional[PlayerWeapon]:
+        weapon_address = (
+            self.pawn.copy()
+            .offset(CS2.offset.schemas.client_dll.C_CSPlayerPawnBase.m_pClippingWeapon)
+            .pointer()
+        )
+        if weapon_address is None: return None
+
+        return PlayerWeapon(weapon_address)

@@ -110,7 +110,19 @@ class CS2:
         from process.offset import Offset
 
         signatures = dump_signatures()
-        schemas = dump_schemas()
+        schemas = dump_schemas([
+            "C_CSGameRules",
+            "C_PlantedC4",
+
+            "CCSPlayerController",
+            "C_BaseEntity",
+            "C_BasePlayerPawn",
+            "C_CSPlayerPawnBase",
+
+            "C_BasePlayerWeapon",
+            "CBasePlayerWeaponVData",
+            "C_CSWeaponBase",
+        ])
 
         Offset.signatures = dict2class(signatures)
         Offset.schemas = dict2class(schemas)

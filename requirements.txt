@@ -7,3 +7,4 @@ tkintertools~=3.0.0rc1
 matplotlib~=3.9.2
 pillow~=10.4.0
 Flask~=3.0.3
+psutil~=6.0.0

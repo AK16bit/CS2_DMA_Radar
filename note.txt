@@ -1,0 +1,15 @@
+Socket:
+    map_sync
+
+    player_pos
+    player_status
+    player_dead
+
+    bomb_planted
+    bomb_exploded
+    bomb_defused
+    bomb_defusing
+    bomb_cancel_defuse
+    bomb_beep
+
+    grenade_create

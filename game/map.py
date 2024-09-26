@@ -8,8 +8,8 @@ from utils import Vec2, Vec3
 
 
 class Map:
-    map_name: str
-    map_meta: dict
+    map_name: Optional[str] = None
+    map_meta: Optional[dict] = None
 
 
     @classmethod
@@ -20,12 +20,15 @@ class Map:
         return cls
 
     @classmethod
-    def world_2_map(cls, world_pos: Vec3) -> Vec2:
+    def world_2_map(cls, world_pos: Vec3) -> Optional[Vec2]:
         #   o-------> x
         #   |
         #   |
         #   v
         #   y
+
+        if cls.map_name is None or cls.map_name == "<empty>": return None
+        if cls.map_meta is None: return None
 
         return Vec2(
             (world_pos.x - cls.map_meta.get("x")) / cls.map_meta.get("scale"),
@@ -46,7 +49,7 @@ class Map:
 
     @staticmethod
     def get_map_meta(map_name: Optional[str] = None) -> dict:
-        with open(join("maps", "map_meta.json"), "r") as map_meta_file: map_meta = loads(map_meta_file.read())
+        with open("map_meta.json", "r") as map_meta_file: map_meta = loads(map_meta_file.read())
         if map_name is None: return map_meta
 
         curr_map_meta: dict = map_meta.get(map_name, dict(x=None, y=None, scale=None))

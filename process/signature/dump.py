@@ -1,4 +1,6 @@
+from gc import get_referrers, collect
 from logging import info
+from sys import getsizeof
 from typing import Dict
 
 from memprocfs import FLAG_NOCACHE
@@ -33,6 +35,7 @@ def get_client_signatures() -> Dict[str, Address]:
         for signature_function in client_signatures_function
     }
 
+    del module_buffer
     return client_signatures
 
 
@@ -43,14 +46,15 @@ engine2_signatures_function = (
         dwNetworkGameClient_serverTickCount,
     )
 def get_engine2_signatures() -> Dict[str, Address]:
-    engine2_base = CS2.engine2.base
-    engine2_buffer = CS2.memory.read_memory(engine2_base, CS2.engine2.size)
+    module_base = CS2.engine2.base
+    module_buffer = CS2.memory.read_memory(module_base, CS2.engine2.size)
 
     engine2_signatures = {
-        engine2_signature_function.__name__: engine2_signature_function(engine2_base, engine2_buffer).to_Address()
-        for engine2_signature_function in engine2_signatures_function
+        signature_function.__name__: signature_function(module_base, module_buffer).to_Address()
+        for signature_function in engine2_signatures_function
     }
 
+    del module_buffer
     return engine2_signatures
 
 

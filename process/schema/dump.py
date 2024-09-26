@@ -11,7 +11,7 @@ from process.cs2 import CS2
 from utils import TimeUseCounter
 
 
-def dump_schemas() -> Dict[str, Dict[str, Dict[str, int]]]:
+def dump_schemas(class_whitelist: Optional[list] = None) -> Dict[str, Dict[str, Dict[str, int]]]:
     try:
         schema_system_address = read_schema_system_address()
         schema_system_struct = StructSchemaSystem(schema_system_address)
@@ -26,11 +26,12 @@ def dump_schemas() -> Dict[str, Dict[str, Dict[str, int]]]:
         except Exception: raise SchemaModuleDumpError
 
         module_name = module_data.get("module_struct").name
-        if module_name not in ("client.dll", "engine2.dll"): continue
+        if module_name != "client.dll": continue
         # print(module_name)
 
         try:
-            classes_list = [read_class(class_address) for class_address in module_data.get("classes_address")]
+            classes_list = [read_class(class_address, class_whitelist) for class_address in module_data.get("classes_address")]
+            classes_list = [class_offset for class_offset in classes_list if class_offset is not None]
             classes = {
                 class_name: class_fields
                 for class_offset in classes_list
@@ -119,9 +120,12 @@ def read_unallocated_address_list(module_struct: StructModule, binding_address: 
     return unallocated_address_list
 
 
-def read_class(class_address: int) -> Dict[str, Dict[str, int]]:
+def read_class(class_address: int, class_whitelist: Optional[list]) -> Optional[Dict[str, Dict[str, int]]]:
     class_struct = StructClass(class_address)
     class_name = class_struct.name
+
+    if class_whitelist is not None and class_name not in class_whitelist:
+        return None
 
     fields = read_field(class_struct.fields, class_struct.fields_count)
     return {class_name: fields}

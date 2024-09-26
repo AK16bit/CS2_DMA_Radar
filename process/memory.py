@@ -12,6 +12,7 @@ from utils import Vec2
 
 class MemoryReadMonitor:
     enable: bool = True
+    force_read: bool = False
     memory_read_count: int = 0
     memory_read_bytes: int = 0
 
@@ -30,7 +31,12 @@ class MemoryReadMonitor:
 
                     MemoryReadMonitor.memory_read_count += 1
                     MemoryReadMonitor.memory_read_bytes += read_byte_size
-                return func(*func_args, **func_kwargs)
+
+
+                try: return func(*func_args, **func_kwargs)
+                except Exception as error_reason:
+                    if MemoryReadMonitor.force_read: return None
+                    else: raise error_reason
 
             return wrapper
         return decorator
