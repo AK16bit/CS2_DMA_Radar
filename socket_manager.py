@@ -2,7 +2,7 @@ from flask_socketio import SocketIO
 from typing import TypedDict, Any, Optional, List
 
 
-class SocketData:
+class SocketManager:
     _socket_io: Optional[SocketIO] = None
 
     @classmethod
@@ -25,7 +25,26 @@ class SocketData:
         time: float
         t: List[dict]
         ct: List[dict]
-
     @classmethod
     def send_players_pos(cls, players_pos: SocketPlayersPos) -> None:
         cls.send_socket("players_pos", players_pos)
+
+    class SocketBombStatus(TypedDict):
+        time: float
+        planted: bool
+        site: str
+        pos: dict
+        time_left: float
+        time_max: float
+        defusing: bool
+        defuse_time_left: float
+    class SocketBombBeep(TypedDict):
+        beep_span: float
+    @classmethod
+    def send_bomb_status(cls, bomb_status: SocketBombStatus) -> None:
+        cls.send_socket("bomb_status", bomb_status)
+    @classmethod
+    def send_bomb_beep(cls, bomb_beep: SocketBombBeep) -> None:
+        cls.send_socket("bomb_beep", bomb_beep)
+
+

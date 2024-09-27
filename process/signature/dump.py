@@ -1,4 +1,4 @@
-from gc import get_referrers, collect
+from gc import collect
 from logging import info
 from sys import getsizeof
 from typing import Dict

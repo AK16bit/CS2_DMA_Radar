@@ -6,7 +6,7 @@ from psutil import net_connections
 
 from error import PortOccupancyError
 from runtime.run_loop import map_update_loop
-from socket_data import SocketData
+from socket_manager import SocketManager
 
 
 def run_web_server(port: int) -> None:
@@ -19,7 +19,7 @@ def run_web_server(port: int) -> None:
     app.config['SECRET_KEY'] = 'secret!'
 
     socketio = SocketIO(app)
-    SocketData.set_socket_io(socketio)
+    SocketManager.set_socket_io(socketio)
 
     @app.route('/')
     def index():

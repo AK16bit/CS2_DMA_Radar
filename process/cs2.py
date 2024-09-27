@@ -113,6 +113,7 @@ class CS2:
         schemas = dump_schemas([
             "C_CSGameRules",
             "C_PlantedC4",
+            "CBaseAnimGraph",
 
             "CCSPlayerController",
             "C_BaseEntity",

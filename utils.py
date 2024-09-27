@@ -25,6 +25,12 @@ class Vec2:
             input_value.get("y", .0)
         )
 
+    def to_list(self) -> list:
+        return [self.x, self.y]
+
+    def to_dict(self) -> dict:
+        return dict(x=self.x, y=self.y)
+
     def __add__(self, other) -> "Vec2":
         if not isinstance(other, Vec2): return NotImplemented
 
@@ -90,6 +96,12 @@ class Vec3:
             input_value.get("y", .0),
             input_value.get("z", .0)
         )
+
+    def to_list(self) -> list:
+        return [self.x, self.y, self.z]
+
+    def to_dict(self) -> dict:
+        return dict(x=self.x, y=self.y, z=self.z)
 
     def __add__(self, other) -> "Vec3":
         if not isinstance(other, Vec3): return NotImplemented

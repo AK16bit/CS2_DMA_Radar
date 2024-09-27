@@ -1,3 +1,4 @@
+from gc import collect
 from logging import info, debug
 from threading import Thread
 from time import sleep
@@ -19,6 +20,7 @@ def setup() -> None:
     debug("Setup Memory Read: Count->%s, Byte->%s" % (MemoryReadMonitor.memory_read_count, MemoryReadMonitor.memory_read_bytes))
     MemoryReadMonitor.reset()
     Address.clear_address_cache()
+    collect()
 
     # sleep(114514)
 
