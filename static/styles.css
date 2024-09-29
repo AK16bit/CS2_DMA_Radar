@@ -12,10 +12,10 @@ body {
 
 #radar {
     position: absolute;
-    left: 50%;
-    top: 50%;
+    /* left: 50%; */
+    /* top: 50%; */
     margin: 0 0;
-    transform: translateY(-50%) translateX(-50%);
+    /* transform: translateY(-50%) translateX(-50%); */
     width: 85vmin;
     height: 85vmin;
     opacity: 0;
@@ -69,6 +69,14 @@ body {
     font-size: 6vmin;
     font-family: 'HYWenHei-85W';
 }
+
+#bomb_status {
+    position: fixed;
+    opacity: 0;
+    border-radius: 30px;
+    background-color: rgba(255, 255, 255, .1);
+}
+
 
 .fade-in {
     animation-name: fade-in;

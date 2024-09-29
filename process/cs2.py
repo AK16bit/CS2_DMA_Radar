@@ -11,6 +11,7 @@ from lib.pyMeow import MeowProcess, MeowModule
 from lib.pyMeow.pyMeow import process_exists
 from process.memory import VmmMemoryReadStruct, MeowMemoryReadStruct, MemoryReadAbstract
 from process.module import VmmModuleStruct, MeowModuleStruct, ModuleAbstract
+from process.offset import Offset
 from utils import dict2class, TimeUseCounter
 
 
@@ -21,8 +22,9 @@ class CS2:
     client: ModuleAbstract
     engine2: ModuleAbstract
     schemasystem: ModuleAbstract
+    tier0: ModuleAbstract
 
-    offset: Type["offset.Offset"]
+    offset: Type["Offset"]
 
     @classmethod
     def setup_memprocfs(cls) -> Type["CS2"]:
@@ -45,10 +47,11 @@ class CS2:
         # get modules
         try:
             modules: Iterable[VmmModule] = cls.process.module_list()
-            CS2.client, CS2.engine2, CS2.schemasystem = itemgetter(
+            CS2.client, CS2.engine2, CS2.schemasystem, CS2.tier0 = itemgetter(
                 "client.dll",
                 "engine2.dll",
                 "schemasystem.dll",
+                "tier0.dll",
             )({
                 module.name: VmmModuleStruct(module)
                 for module in modules
@@ -59,7 +62,8 @@ class CS2:
             for module in (
                 cls.client,
                 cls.engine2,
-                cls.schemasystem
+                cls.schemasystem,
+                cls.tier0,
             )]))
 
         # setup memory read
@@ -80,10 +84,11 @@ class CS2:
         # get modules
         try:
             modules: Generator[MeowModule, None, None] = cls.process.modules()
-            CS2.client, CS2.engine2, CS2.schemasystem = itemgetter(
+            CS2.client, CS2.engine2, CS2.schemasystem, CS2.tier0 = itemgetter(
                 "client.dll",
                 "engine2.dll",
                 "schemasystem.dll",
+                "tier0.dll",
             )({
                 module.name: MeowModuleStruct(module)
                 for module in modules
@@ -94,7 +99,8 @@ class CS2:
             for module in (
                 cls.client,
                 cls.engine2,
-                cls.schemasystem
+                cls.schemasystem,
+                cls.tier0,
             )]))
 
         # setup memory read
@@ -107,6 +113,7 @@ class CS2:
     def update_offsets(cls) -> Type["CS2"]:
         from process.signature.dump import dump_signatures
         from process.schema.dump import dump_schemas
+        from process.convar.dump import dump_convar
         from process.offset import Offset
 
         signatures = dump_signatures()
@@ -124,9 +131,11 @@ class CS2:
             "CBasePlayerWeaponVData",
             "C_CSWeaponBase",
         ])
+        convars = dump_convar()
 
         Offset.signatures = dict2class(signatures)
         Offset.schemas = dict2class(schemas)
-        cls.offset: Type[Offset] = Offset
+        Offset.convars = dict2class(convars)
+        cls.offset = Offset
 
         return cls

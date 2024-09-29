@@ -10,15 +10,19 @@
 </head>
 <body>
     <div id="radar">
-        <img id="map_image" src="/static/no_map.png" width="1024" height="1024">
-        <canvas id="overlay" width="1024" height="1024"></canvas>
+        <img id="map_image" src="/static/no_map.png" width="1024" height="1024" draggable="false">
+        <canvas id="overlay" width="1024" height="1024" draggable="false"></canvas>
     </div>
 
     <div id="info_pop" onclick="hideInfoPop();">
       <div class="info-pop-content">
           <img src="/static/icon.png" class="info-pop-icon">
-        <h1 class="info-pop-h1">AK拷打众生之线上雷达</h1>
+        <h1 class="info-pop-h1">AK-TestTestTest32767</h1>
       </div>
+    </div>
+
+    <div id="bomb_status">
+        <img src="/static/icon.png" draggable="false" style="width: 200px; height: 200px;">
     </div>
 
     <script src="static/script.js"></script>

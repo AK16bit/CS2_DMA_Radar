@@ -12,7 +12,6 @@ from runtime.server import run_web_server
 from utils import logger_setup, RepeatThread
 
 
-
 def setup() -> None:
     try: CS2.setup_pymeow().update_offsets()
     except Exception: raise ProcessSetupError

@@ -1,5 +1,4 @@
 from functools import wraps
-from logging import warning
 from typing import Self, Optional, Dict, Any, Callable, Sequence
 
 from process.cs2 import CS2
