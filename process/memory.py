@@ -58,7 +58,7 @@ class MemoryReadAbstract:
             return unpack("<" + format_str, byte)[0]
         except Exception as error_reason:
             error("UnpackByteError: (byte: %s, format_str: %s, error: %s)" % (byte, "<" + format_str, error_reason))
-            raise
+            # raise
         #     return None
         # except TypeError: return None
         # except Exception: raise "something is wrong..."
@@ -119,11 +119,11 @@ class VmmMemoryReadStruct(MemoryReadAbstract):
 
     @classmethod
     def read_i8(cls, address: int) -> Optional[int]:
-        return cls.unpack_byte(cls.read_memory(address, 2), "b")
+        return cls.unpack_byte(cls.read_memory(address, 1), "b")
 
     @classmethod
     def read_u8(cls, address: int) -> Optional[int]:
-        return cls.unpack_byte(cls.read_memory(address, 2), "B")
+        return cls.unpack_byte(cls.read_memory(address, 1), "B")
 
     @classmethod
     def read_i16(cls, address: int) -> Optional[int]:
@@ -155,7 +155,12 @@ class VmmMemoryReadStruct(MemoryReadAbstract):
 
     @classmethod
     def read_vec(cls, address: int, size: int) -> Optional[Sequence[float]]:
-        return cls.unpack_byte(cls.read_memory(address, 4 * size), "%if" % size)
+        try:
+            byte = cls.read_memory(address, 4 * size)
+            return unpack("<%if" % size, byte)[0]
+        except Exception as error_reason:
+            error("UnpackByteError: (byte: %s, format_str: %s, error: %s)" % (byte, "<%if" % size, error_reason))
+            # raise
 
     @classmethod
     def read_str(cls, address: int, byte_size: int = 50) -> Optional[str]:
@@ -219,7 +224,7 @@ class MeowMemoryReadStruct(MemoryReadAbstract):
 
     @classmethod
     @MemoryReadMonitor.memory_read_monitor_decorator(None, 2)
-    def read_vec(cls, address: int, size: int) -> Sequence[float]:
+    def read_vec(cls, address: int, size: int) -> Optional[Sequence[float]]:
         return r_floats(cls._process, address, size)
 
     @classmethod
