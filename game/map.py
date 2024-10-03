@@ -38,7 +38,7 @@ class Map:
     @staticmethod
     def get_map_name() -> Optional[str]:
         global_var_address: Address = CS2.offset.signatures.client.dwGlobalVars.pointer()
-        map_name_address = global_var_address.offset(0x1B8).pointer()
+        map_name_address = global_var_address.offset(0x180).pointer()
 
         map_name = map_name_address.str(50)
         return map_name

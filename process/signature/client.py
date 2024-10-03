@@ -33,7 +33,7 @@ def dwGameRules(module_base: int, module_buffer: bytes) -> PatternVerA2X:
 
 def dwGlobalVars(module_base: int, module_buffer: bytes) -> PatternVerA2X:
     return (
-        PatternVerA2X("48 89 0D ?? ?? ?? ?? 48 89 41", module_base, module_buffer)
+        PatternVerA2X("48 89 15 ?? ?? ?? ?? 48 89 42", module_base, module_buffer)
         .aob_scan()
         .rip()
     )
@@ -91,7 +91,7 @@ def dwViewRender(module_base: int, module_buffer: bytes) -> PatternVerA2X:
 
 def dwWeaponC4(module_base: int, module_buffer: bytes) -> PatternVerA2X:
     return (
-        PatternVerA2X("48 8B 15 ?? ?? ?? ?? FF C0 89 05 ?? ?? ?? ?? 48 8B C6 48 89 34 EA 48 8B 6C 24 ?? C6 86 ?? ?? ?? ?? ?? 80 BE", module_base, module_buffer)
+        PatternVerA2X("48 8B 15 ?? ?? ?? ?? 48 8B 5C 24 ?? FF C0 89 05 ?? ?? ?? ?? 48 8B C6 48 89 34 EA 48 8B 6C 24 ?? C6 86 ?? ?? ?? ?? ?? 80 BE", module_base, module_buffer)
         .aob_scan()
         .rip()
     )

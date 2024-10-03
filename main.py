@@ -36,7 +36,7 @@ def main() -> None:
 |__/  |__/|__/  \__/ \______/ |________/|__/      \______/ |__/""".split("\n")]
     setup()
 
-    run_loop_thread = RepeatThread(1 / 60, run_loop)
+    run_loop_thread = RepeatThread(1 / 64, run_loop)
     run_loop_thread.start()
 
     map_update_thread = RepeatThread(30, map_update_loop)
