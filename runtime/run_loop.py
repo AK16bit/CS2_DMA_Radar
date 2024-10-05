@@ -16,7 +16,7 @@ def run_loop() -> None:
     time_now = time()
 
     # players_pos
-    players_pos_socket: SocketManager.SocketPlayersPos = dict(
+    players_dot_socket: SocketManager.SocketPlayersDot = dict(
         time=time_now,
         t=list(),
         ct=list()
@@ -31,15 +31,20 @@ def run_loop() -> None:
             map_pos = Map.world_2_map(pos)
             if map_pos is None: continue
 
-            players_pos_socket.get({
+            direction = player_entity.angle
+            if direction is None: continue
+
+            players_dot_socket.get({
                 2: "t",
                 3: "ct",
             }.get(player_entity.team_num), list()
             ).append(dict(
                 x=map_pos.x,
-                y=map_pos.y
+                y=map_pos.y,
+                d=direction.y,
+                id=player_entity.steam_id
             ))
-        SocketManager.send_players_pos(players_pos_socket)
+        SocketManager.send_players_dot(players_dot_socket)
     except Exception as error_reason: error("Error at run_loop->players_pos: %s" % error_reason)
 
     # players_status

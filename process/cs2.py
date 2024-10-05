@@ -123,6 +123,7 @@ class CS2:
             "CBaseAnimGraph",
 
             "CCSPlayerController",
+            "CBasePlayerController",
             "C_BaseEntity",
             "C_BasePlayerPawn",
             "C_CSPlayerPawnBase",

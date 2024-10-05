@@ -170,3 +170,11 @@ class PlayerEntity:
         if weapon_address is None: return None
 
         return PlayerWeapon(weapon_address)
+
+    @property
+    def steam_id(self) -> Optional[int]:
+        return (
+            self.controller.copy()
+            .offset(CS2.offset.schemas.client_dll.CBasePlayerController.m_steamID)
+            .u64()
+        )

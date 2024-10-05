@@ -21,13 +21,18 @@ class SocketManager:
     def send_map_sync(cls, map_name: str) -> None:
         cls.send_socket("map_sync", "static/no_map.png" if map_name is None or map_name == "<empty>" else "static/maps/%s.png" % map_name)
 
-    class SocketPlayersPos(TypedDict):
+    class SocketPlayersDot(TypedDict):
+        class PlayerDot(TypedDict):
+            x: float
+            y: float
+            r: float
+            id: int
         time: float
-        t: List[dict]
-        ct: List[dict]
+        t: List[PlayerDot]
+        ct: List[PlayerDot]
     @classmethod
-    def send_players_pos(cls, players_pos: SocketPlayersPos) -> None:
-        cls.send_socket("players_pos", players_pos)
+    def send_players_dot(cls, players_dot: SocketPlayersDot) -> None:
+        cls.send_socket("players_dot", players_dot)
 
     class SocketBombStatus(TypedDict):
         time: float
