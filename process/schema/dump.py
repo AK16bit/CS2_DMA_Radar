@@ -8,7 +8,7 @@ from process.schema.struct import StructSchemaSystem, StructModule, StructMemory
     StructHashBucket, StructUnAllocatedClassBase, StructClass, StructField
 from process.pattern import PatternVerA2X, PatternVerOsiris
 from process.cs2 import CS2
-from utils import TimeUseCounter
+from utils import TimeUsedCounter
 
 
 def dump_schemas(class_whitelist: Optional[list] = None) -> Dict[str, Dict[str, Dict[str, int]]]:

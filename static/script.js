@@ -38,12 +38,11 @@ socket.on("map_sync", function(data) {
 socket.on("players_dot", function(data) {
 //    radarWindow.config.rotation = Math.cos((new Date().getTime()) / 1000 * .4) * 360;
 //    radarWindow.config.scale = 0.5 + Math.sin((new Date().getTime()) / 1000 * 1.2) * 0.5;
+    radarWindow.players = data["players"];
 
+    radarWindow.updateConfig();
     radarWindow.mapCanvas.draw();
-    radarWindow.playersDot.drawPlayersDot(data);
-    radarWindow.aaa();
-
-    radarWindow.players = data;
+    radarWindow.playersDot.drawPlayersDot();
 });
 
 socket.on("bomb_status", function(data) {
@@ -66,6 +65,17 @@ function Radar() {
         scale: 1,
         rotation: 0
     };
+    this.getRotatePos = function(x, y) {
+        radianRotation = (this.config.rotation + 180) * Math.PI / -180;
+
+        oppoX = (x - this.config.x) * this.config.scale;
+        oppoY = (y - this.config.y) * this.config.scale;
+
+        x = 512 - oppoX * Math.cos(radianRotation) - oppoY * Math.sin(radianRotation);
+        y = 512 + oppoX * Math.sin(radianRotation) - oppoY * Math.cos(radianRotation);
+
+        return [x, y];
+    }
 
     this.players = {};
 
@@ -76,7 +86,7 @@ function Radar() {
         this.boundPlayerId = steamId;
     };
 
-    this.aaa = function() {
+    this.updateConfig = function() {
         if (this.boundPlayerId == 0) {
             this.config.x = 512;
             this.config.y = 512;
@@ -85,18 +95,19 @@ function Radar() {
             this.playersDot.tColor = this.playersDot.T_COLOR;
             this.playersDot.ctColor = this.playersDot.CT_COLOR;
         } else {
-            this.players["t"].concat(this.players["ct"]).forEach((playerEntity) => {
+            this.players.forEach((playerEntity) => {
                 if (playerEntity["id"] == this.boundPlayerId) {
                     this.config.x = playerEntity["x"];
                     this.config.y = playerEntity["y"];
                     this.config.rotation = playerEntity["d"] - 90;
 
-                    this.playersDot.tColor = (this.players["t"].indexOf(playerEntity) != -1) ? this.playersDot.TEAMMATE_COLOR : this.playersDot.ENEMY_COLOR;
-                    this.playersDot.ctColor = (this.players["ct"].indexOf(playerEntity) != -1) ? this.playersDot.TEAMMATE_COLOR : this.playersDot.ENEMY_COLOR;
+                    this.playersDot.tColor = playerEntity["team"] == "t" ? this.playersDot.TEAMMATE_COLOR : this.playersDot.ENEMY_COLOR;
+                    this.playersDot.ctColor = playerEntity["team"] == "ct" ? this.playersDot.TEAMMATE_COLOR : this.playersDot.ENEMY_COLOR;
                 };
             });
         };
     };
+//    setInterval(this.aaa, 1);
 
     this.mapCanvas = new (function(parent) {
         this.radar = parent
@@ -125,8 +136,8 @@ function Radar() {
 
             this.ctx.drawImage(
                 this.mapImage,
-                -this.canvas.width / (1024 / this.radar.config.x) * this.radar.config.scale,
-                -this.canvas.height / (1024 / this.radar.config.y) * this.radar.config.scale,
+                -this.radar.config.x * this.radar.config.scale,
+                -this.radar.config.y * this.radar.config.scale,
                 this.canvas.width * this.radar.config.scale,
                 this.canvas.height * this.radar.config.scale
             );
@@ -148,28 +159,29 @@ function Radar() {
         this.tColor = this.T_COLOR;
         this.ctColor = this.CT_COLOR;
 
-        this.drawPlayersDot = (socketData) => {
+        this.drawPlayersDot = () => {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-            // T
-            socketData["t"].forEach((playerEntity) => {
-                this.drawDot(playerEntity["x"], playerEntity["y"], this.tColor);
-            });
-
-            // CT
-            socketData["ct"].forEach((playerEntity) => {
-                this.drawDot(playerEntity["x"], playerEntity["y"], this.ctColor);
-//                console.log(playerEntity["id"]);
+//            // T
+//            socketData["t"].forEach((playerEntity) => {
+//                this.drawDot(playerEntity["x"], playerEntity["y"], this.tColor);
+//            });
+//
+//            // CT
+//            socketData["ct"].forEach((playerEntity) => {
+//                this.drawDot(playerEntity["x"], playerEntity["y"], this.ctColor);
+//            //  console.log(playerEntity["id"]);
+//            });
+            this.radar.players.forEach((playerEntity) => {
+                this.drawDot(
+                    playerEntity["x"], playerEntity["y"], playerEntity["d"],
+                    (playerEntity["team"] == "t") ? this.tColor : (playerEntity["team"] == "ct" ? this.ctColor : "#808080")
+                );
             });
         };
 
-        this.drawDot = (x, y, color) => {
-            radianRotation = (this.radar.config.rotation + 180) * Math.PI / -180
-
-            oppoX = (x - this.canvas.width / (1024 / this.radar.config.x)) * this.radar.config.scale
-            oppoY = (y - this.canvas.height / (1024 / this.radar.config.y)) * this.radar.config.scale
-            x = this.canvas.width / 2 - oppoX * Math.cos(radianRotation) - oppoY * Math.sin(radianRotation);
-            y = this.canvas.height / 2 + oppoX * Math.sin(radianRotation) - oppoY * Math.cos(radianRotation);
+        this.drawDot = (x, y, direction, color) => {
+            [x, y] = this.radar.getRotatePos(x, y);
 
             this.ctx.beginPath();
             this.ctx.arc(x, y, 8, 0, 2 * Math.PI);

@@ -53,16 +53,21 @@ class PlayerEntity:
         if self._player_controller is None:
             match self._init_type:
                 case 0:
-                    # list entry
-                    controller_list_entry_address = self._get_list_entry_address(
-                        self._entity_list_address, self._player_index
-                    )
-                    if not controller_list_entry_address.address: return None
+                    from game.entity_list import EntityList
 
-                    # controller address
-                    player_controller_address = controller_list_entry_address.offset(
-                        self._get_list_entry_offset(self._player_index)
-                    ).pointer()
+                    # # list entry
+                    # controller_list_entry_address = EntityList.get_list_entry_address(
+                    #     self._entity_list_address, self._player_index
+                    # )
+                    # if not controller_list_entry_address.address: return None
+                    #
+                    # # controller address
+                    # player_controller_address = controller_list_entry_address.offset(
+                    #     EntityList.get_list_entry_offset(self._player_index)
+                    # ).pointer()
+                    # if not player_controller_address.address: return None
+
+                    player_controller_address = EntityList.get_entity_from_list_entry(self._player_index)
                     if not player_controller_address.address: return None
 
                     self._player_controller = player_controller_address
@@ -76,6 +81,8 @@ class PlayerEntity:
         if self._player_pawn is None:
             match self._init_type:
                 case 0:
+                    from game.entity_list import EntityList
+
                     # pawn offset
                     pawn_offset = (
                         self.controller.copy()
@@ -83,16 +90,19 @@ class PlayerEntity:
                         .u32()
                     )
 
-                    # list entry
-                    pawn_list_entry_address = self._get_list_entry_address(
-                        self._entity_list_address, pawn_offset
-                    )
-                    if not pawn_list_entry_address.address: return None
+                    # # list entry
+                    # pawn_list_entry_address = EntityList.get_list_entry_address(
+                    #     self._entity_list_address, pawn_offset
+                    # )
+                    # if not pawn_list_entry_address.address: return None
+                    #
+                    # # pawn address
+                    # player_pawn_address = pawn_list_entry_address.offset(
+                    #     EntityList.get_list_entry_offset(pawn_offset)
+                    # ).pointer()
+                    # if not player_pawn_address.address: return None
 
-                    # pawn address
-                    player_pawn_address = pawn_list_entry_address.offset(
-                        self._get_list_entry_offset(pawn_offset)
-                    ).pointer()
+                    player_pawn_address = EntityList.get_entity_from_list_entry(pawn_offset)
                     if not player_pawn_address.address: return None
 
                     self._player_pawn = player_pawn_address

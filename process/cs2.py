@@ -12,7 +12,7 @@ from lib.pyMeow.pyMeow import process_exists
 from process.memory import VmmMemoryReadStruct, MeowMemoryReadStruct, MemoryReadAbstract
 from process.module import VmmModuleStruct, MeowModuleStruct, ModuleAbstract
 from process.offset import Offset
-from utils import dict2class, TimeUseCounter
+from utils import dict2class, TimeUsedCounter
 
 
 class CS2:
@@ -131,6 +131,10 @@ class CS2:
             "C_BasePlayerWeapon",
             "CBasePlayerWeaponVData",
             "C_CSWeaponBase",
+
+            "C_BaseGrenade",
+            "C_BaseCSGrenadeProjectile",
+            "C_SmokeGrenadeProjectile",
         ])
         convars = dump_convar()
 

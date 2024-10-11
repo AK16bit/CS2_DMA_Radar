@@ -26,10 +26,11 @@ class SocketManager:
             x: float
             y: float
             r: float
-            id: int
+            team: str
+            id: str
+
         time: float
-        t: List[PlayerDot]
-        ct: List[PlayerDot]
+        players: List[PlayerDot]
     @classmethod
     def send_players_dot(cls, players_dot: SocketPlayersDot) -> None:
         cls.send_socket("players_dot", players_dot)

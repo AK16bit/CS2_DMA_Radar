@@ -12,8 +12,9 @@ class PlayerWeapon:
     def name(self) -> Optional[str]:
         return (
             self.address.copy()
-            .offset(0x10).pointer()
-            .offset(0x20).pointer()
+            .pointer_chain(0x10, 0x20)
+            # .offset(0x10).pointer()
+            # .offset(0x20).pointer()
             .str(40)
         )
 

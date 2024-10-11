@@ -5,6 +5,8 @@ from time import perf_counter
 from typing import Dict, Optional, Union, Self, List, Sequence
 from threading import Timer
 
+from process.memory import MemoryReadMonitor
+
 
 @dataclass
 class Vec2:
@@ -205,17 +207,69 @@ def dict2class(a: dict):
     })()
 
 
-class TimeUseCounter:
-    def __enter__(self):
-        self.start_time = perf_counter()
-
-    def __exit__(self, _, __, ___):
-        print("time used: %s ms" % ((perf_counter() - self.start_time) * 1000))
-
-
 class RepeatThread(Timer):
     def run(self):
         while not self.finished.is_set():
             self.function(*self.args, **self.kwargs)
             self.finished.wait(self.interval)
 
+
+class TimeUsedCounter:
+    def __init__(self, time_list: Sequence = None) -> None:
+        self.time_list = list() if time_list is None else time_list
+
+    def __enter__(self) -> None:
+        self.start_time = perf_counter()
+
+    def __exit__(self, _, __, ___) -> None:
+        time_used = perf_counter() - self.start_time
+        self.time_list.append(time_used)
+
+        print("time used: %s ms" % (time_used * 1000))
+
+
+class RunningDebugger:
+    max_index = 128
+    time_used = list()
+    memory_read_count = list()
+    memory_read_bytes = list()
+
+    @classmethod
+    def update_time_used(cls) -> Self:
+        if len(cls.time_used) > cls.max_index:
+            cls.time_used = cls.time_used[slice(-cls.max_index, len(cls.time_used))]
+        return cls
+
+    @classmethod
+    def update_memory_read(cls) -> Self:
+        cls.memory_read_count.append(MemoryReadMonitor.memory_read_count)
+        if len(cls.memory_read_count) > cls.max_index:
+            cls.memory_read_count = cls.memory_read_count[slice(-cls.max_index, len(cls.memory_read_count))]
+
+        cls.memory_read_bytes.append(MemoryReadMonitor.memory_read_bytes)
+        if len(cls.memory_read_bytes) > cls.max_index:
+            cls.memory_read_bytes = cls.memory_read_bytes[slice(-cls.max_index, len(cls.memory_read_bytes))]
+
+        return cls
+
+
+    @classmethod
+    @property
+    def time_used_mean(cls) -> float:
+        if len(cls.time_used):
+            return sum(cls.time_used) / len(cls.time_used)
+        return 0
+
+    @classmethod
+    @property
+    def memory_read_count_mean(cls) -> int:
+        if len(cls.memory_read_count):
+            return int(sum(cls.memory_read_count) / len(cls.memory_read_count))
+        return 0
+
+    @classmethod
+    @property
+    def memory_read_bytes_mean(cls) -> float:
+        if len(cls.memory_read_bytes):
+            return sum(cls.memory_read_bytes) / len(cls.memory_read_bytes)
+        return 0

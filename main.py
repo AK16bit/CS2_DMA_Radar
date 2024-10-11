@@ -1,9 +1,11 @@
 from gc import collect
 from logging import info, debug
 from threading import Thread
-from time import sleep
+from time import sleep, time
 
 from error import ProcessSetupError
+from game.entity_list import EntityList
+from game.projectile_entity import ProjectileEntity
 from process.address import Address
 from process.cs2 import CS2
 from process.memory import MemoryReadMonitor
@@ -24,6 +26,30 @@ def setup() -> None:
     # sleep(114514)
 
 
+def test_projectile() -> None:
+    # entity_list_address = CS2.offset.signatures.client.dwEntityList.pointer().offset(0x10).pointer()
+    entity_list_address = CS2.offset.signatures.client.dwEntityList.pointer()
+
+    while True:
+        for entity_index in range(64, 1024):
+            # entity_address = entity_list_address.address + 0x78 * (entity_index)
+            entity_address = EntityList.get_entity_from_list_entry(entity_list_address, entity_index)
+            if not entity_address.address: continue
+
+            try:
+                class_name = entity_address.copy().pointer_chain(0x10, 0x20).str(32)
+                if "projectile" in class_name:
+                    entity = ProjectileEntity(entity_address)
+
+                    print(
+                        time(), entity_index, class_name, entity.detonate_time
+                        # entity_base.offset(0x1120).float() - CS2.offset.signatures.client.dwGlobalVars.pointer().offset(0x34).float(),
+                        # entity_base.offset(0x111A).bool()
+                    )
+            except Exception: ...
+
+        Address.clear_address_cache()
+
 def main() -> None:
     logger_setup()
     [info(line) for line in r"""  /$$$$$$  /$$   /$$  /$$$$$$   /$$$$$$  /$$$$$$$$ /$$$$$$  /$$$$$$$$
@@ -36,7 +62,8 @@ def main() -> None:
 |__/  |__/|__/  \__/ \______/ |________/|__/      \______/ |__/""".split("\n")]
     setup()
 
-    run_loop_thread = RepeatThread(1 / 64, run_loop)
+    # test_projectile()
+    run_loop_thread = RepeatThread(1 / 128, run_loop)
     run_loop_thread.start()
 
     map_update_thread = RepeatThread(30, map_update_loop)

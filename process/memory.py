@@ -7,14 +7,21 @@ from memprocfs.vmmpyc import VmmProcess
 
 from lib.pyMeow.pyMeow import r_int8, r_int16, r_int, r_int64, r_uint16, r_uint, r_uint64, r_float, r_bool, r_bytes, r_string, r_floats
 from lib.pyMeow.structure import StructMeowProcess
-from utils import Vec2
 
 
 class MemoryReadMonitor:
     enable: bool = True
-    force_read: bool = False
+    no_raise: bool = True
     memory_read_count: int = 0
     memory_read_bytes: int = 0
+
+    @classmethod
+    def read_count_add(cls) -> None:
+        cls.memory_read_count += 1
+
+    @classmethod
+    def read_bytes_add(cls, size: int) -> None:
+        cls.memory_read_bytes += size
 
     @staticmethod
     def memory_read_monitor_decorator(byte_size: int | None, *args) -> Callable:
@@ -29,13 +36,13 @@ class MemoryReadMonitor:
                         else: raise ValueError
                     else: raise ValueError
 
-                    MemoryReadMonitor.memory_read_count += 1
-                    MemoryReadMonitor.memory_read_bytes += read_byte_size
+                    MemoryReadMonitor.read_count_add()
+                    MemoryReadMonitor.read_bytes_add(read_byte_size)
 
 
                 try: return func(*func_args, **func_kwargs)
                 except Exception as error_reason:
-                    if MemoryReadMonitor.force_read: return None
+                    if MemoryReadMonitor.no_raise: return None
                     else: raise error_reason
 
             return wrapper

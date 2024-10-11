@@ -22,6 +22,14 @@ body {
     border-radius: 30px;
     background-color: rgba(255, 255, 255, .1);
 }
+#mapCanvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    border-radius: 30px;
+    filter: drop-shadow(5px 5px 8px rgba(0, 0, 0, .7));
+}
 #playersDot {
     position: absolute;
     width: 100%;
@@ -30,13 +38,13 @@ body {
     border-radius: 30px;
     filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 1));
 }
-#mapCanvas {
+#bombIcon {
     position: absolute;
     width: 100%;
     height: 100%;
-    z-index: 0;
+    z-index: 2;
     border-radius: 30px;
-    filter: drop-shadow(5px 5px 8px rgba(0, 0, 0, .7));
+    filter: drop-shadow(5px 5px 8px rgba(0, 0, 0, 1));
 }
 
 #info_pop {
